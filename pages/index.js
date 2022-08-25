@@ -32,7 +32,7 @@ export default function Home() {
         },
       };
       setLoading(true);
-      let data = { from, to, time, email: session.user.email };
+      let data = { from, to, time, email: session.user.email ,user: session.user.name,};
       if (phone) {
         if (String(phone).length === 10) {
           data.phone = "+91" + String(phone);
