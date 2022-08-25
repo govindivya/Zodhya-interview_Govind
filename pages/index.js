@@ -23,11 +23,6 @@ export default function Home() {
     setTime(e.target.time.value);
     setPhone(e.target.phone.value);
   };
-  useEffect(() => {
-    if (!session) {
-      signIn();
-    }
-  }, [session]);
 
   useEffect(() => {
     if (to && from && time) {
