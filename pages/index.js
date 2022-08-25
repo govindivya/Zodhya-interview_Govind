@@ -55,11 +55,11 @@ export default function Home() {
         })
         .catch((e) => {
           console.log(e);
-          alert.error(e.response.data.message)
+          alert.error(e.response.data.message);
           setLoading(false);
         });
     }
-  }, [to, from, time]);
+  }, [to, from, time, phone]);
 
   useEffect(() => {
     console.log(tweets);

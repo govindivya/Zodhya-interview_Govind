@@ -7,6 +7,7 @@ const Tweet = ({ tweet }) => {
       <div className="w-full relative p-5 m-5 ">
         <h1 className="text-2xl text-gray-500">
           <a
+           rel="noreferrer"
             href={href}
             target="_blank"
             className="hover:underline hover:text-blue-400"
