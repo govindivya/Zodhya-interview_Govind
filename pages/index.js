@@ -12,7 +12,7 @@ export default function Home() {
   const [to, setTo] = useState("");
   const [time, setTime] = useState();
   const [tweets, setTweets] = useState([]);
-  const [sheduleTime, setSheduleTime] = useState();
+  const [sheduleTime, setSheduleTime] = useState("");
   const [loading, setLoading] = useState(false);
   const [phone, setPhone] = useState();
   const alert = useAlert();
@@ -50,7 +50,13 @@ export default function Home() {
           setTweets(res.data.tweets.data);
           setLoading(false);
           setSheduleTime(res.data.startDay);
-          alert.success(res.data.startDay);
+          if (!res.data.error) {
+            alert.success(
+              "All the details has been set to your mobile and email."
+            );
+          } else {
+            alert.error(res.data.error);
+          }
         })
         .catch((e) => {
           console.log(e);
@@ -140,6 +146,11 @@ export default function Home() {
                 Submit
               </button>
             </form>
+            <div className="flex justify-center mt-10 mx-auto">
+              {
+                sheduleTime !=""?<p className="text-2xl text-blue-900">You can start your journey on :{sheduleTime}</p>:""
+              }
+            </div>
           </div>
         </div>
 
