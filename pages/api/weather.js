@@ -352,11 +352,9 @@ export default async function handler(req, res) {
         )
         .catch((e) => {
           console.log(e.message);
-          res
-            .status(500)
-            .json({
-              message: "something went wrong while fetching weather data!",
-            });
+          res.status(500).json({
+            message: "something went wrong while fetching weather data!",
+          });
         });
       let toForecastDay = to.forecast.forecastday;
       toForecastDay.forEach((daydetails, index) => {
@@ -431,7 +429,7 @@ export default async function handler(req, res) {
         };
         let data = await mailer(req);
         if (data.error) {
-          res.status(500).json({
+          return res.status(500).json({
             message: "something went wrong while sending sms and email",
           });
         }
@@ -441,12 +439,12 @@ export default async function handler(req, res) {
           condition: [fromForecastDay[fromIndex], toForecastDay[reachIndex]],
         });
       }
-      res.status(404).json({
+      return res.status(404).json({
         message: "No suitable date found withing next 14 days",
       });
     } catch (error) {
       console.log(error.message);
-      res.status(500).json({
+      return res.status(500).json({
         message: "something went wrong",
       });
     }
