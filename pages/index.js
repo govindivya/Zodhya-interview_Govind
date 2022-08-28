@@ -32,7 +32,6 @@ export default function Home() {
         },
       };
       setLoading(true);
-<<<<<<< HEAD
       let data = {
         from,
         to,
@@ -40,9 +39,6 @@ export default function Home() {
         user: session.user.name,
         email: session.user.email,
       };
-=======
-      let data = { from, to, time, email: session.user.email ,user: session.user.name,};
->>>>>>> 81d830722aad39dc01073092ffc62bf51d235d91
       if (phone) {
         if (String(phone).length === 10) {
           data.phone = "+91" + String(phone);
@@ -54,13 +50,17 @@ export default function Home() {
           setTweets(res.data.tweets.data);
           setLoading(false);
           setSheduleTime(res.data.startDay);
-          alert.success(
-            "All the details has been set to your mobile and email."
-          );
+          if (!res.data.error) {
+            alert.success(
+              "All the details has been set to your mobile and email."
+            );
+          } else {
+            alert.error(res.data.error);
+          }
         })
         .catch((e) => {
           console.log(e);
-          alert.error(e.response.data.message);
+          alert.error("Something went wrong");
           setLoading(false);
         });
     }
@@ -68,6 +68,9 @@ export default function Home() {
 
   useEffect(() => {
     console.log(tweets);
+    if (tweets.length > 0) {
+      window.scrollBy(0,500);
+    }
   }, [tweets]);
 
   if (!session) {

@@ -428,20 +428,21 @@ export default async function handler(req, res) {
           email: req.body.email,
         };
         let data = await mailer(req);
-        if (data.error) {
-          return res.status(500).json({
-            message: "something went wrong while sending sms and email",
-          });
-        }
-        return res.status(200).json({
+        let resData = {
           startDay,
           tweets,
           condition: [fromForecastDay[fromIndex], toForecastDay[reachIndex]],
+        };
+        if (data.error) {
+          resData.error =
+            "Email has been sent to your mail but not sms beacsue your mobile is not verified by twillio to send sms.!";
+        }
+        return res.status(200).json(resData);
+      } else {
+        return res.status(404).json({
+          message: "No suitable date found withing next 14 days",
         });
       }
-      return res.status(404).json({
-        message: "No suitable date found withing next 14 days",
-      });
     } catch (error) {
       console.log(error.message);
       return res.status(500).json({
@@ -499,14 +500,14 @@ async function mailer(req) {
         message: "details has been send to email and mobile number",
       };
     } catch (error) {
-      console.log(error);
+      console.log("The errors are : ", error.name);
       return {
         error: "something went wrong!.",
       };
     }
   } else {
     return {
-      error: "something went wrong",
+      error: "Not a valid request method!",
     };
   }
 }

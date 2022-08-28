@@ -22,7 +22,9 @@
   max-width: 100%;
   opacity: 0.5;
 }
-
+html{
+  scroll-behavior: smooth;
+}
 .loading > div {
   width: 10vmax;
   height: 10vmax;
