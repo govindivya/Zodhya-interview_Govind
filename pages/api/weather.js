@@ -393,7 +393,7 @@ export default async function handler(req, res) {
               if (j - i === travelTimeInDays) {
                 startDay = new Date(
                   Date.now() + i * 60 * 60 * 24 * 1000
-                ).toLocaleDateString();
+                ).toDateString();
                 fromIndex = i;
                 reachIndex = j;
                 break;
