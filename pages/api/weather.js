@@ -11,93 +11,6 @@ const nodeMailer = require("nodemailer");
 //   access_token_secret: process.env.TWIITER_ACCESS_SECRET,
 // });
 
-const noRainyCodes = [
-  {
-    code: 1000,
-    day: "Sunny",
-    night: "Clear",
-    icon: 113,
-  },
-  {
-    code: 1003,
-    day: "Partly cloudy",
-    night: "Partly cloudy",
-    icon: 116,
-  },
-  {
-    code: 1006,
-    day: "Cloudy",
-    night: "Cloudy",
-    icon: 119,
-  },
-  {
-    code: 1009,
-    day: "Overcast",
-    night: "Overcast",
-    icon: 122,
-  },
-  {
-    code: 1030,
-    day: "Mist",
-    night: "Mist",
-    icon: 143,
-  },
-  {
-    code: 1213,
-    day: "Light snow",
-    night: "Light snow",
-    icon: 326,
-  },
-  {
-    code: 1216,
-    day: "Patchy moderate snow",
-    night: "Patchy moderate snow",
-    icon: 329,
-  },
-  {
-    code: 1219,
-    day: "Moderate snow",
-    night: "Moderate snow",
-    icon: 332,
-  },
-  {
-    code: 1222,
-    day: "Patchy heavy snow",
-    night: "Patchy heavy snow",
-    icon: 335,
-  },
-  {
-    code: 1225,
-    day: "Heavy snow",
-    night: "Heavy snow",
-    icon: 338,
-  },
-  {
-    code: 1237,
-    day: "Ice pellets",
-    night: "Ice pellets",
-    icon: 350,
-  },
-  {
-    code: 1066,
-    day: "Patchy snow possible",
-    night: "Patchy snow possible",
-    icon: 179,
-  },
-  {
-    code: 1135,
-    day: "Fog",
-    night: "Fog",
-    icon: 248,
-  },
-  {
-    code: 1147,
-    day: "Freezing fog",
-    night: "Freezing fog",
-    icon: 260,
-  },
-];
-
 const rainyAndTunderingWeatherCodes = [
   {
     code: 1063,
@@ -347,7 +260,6 @@ export default async function handler(req, res) {
           axios.spread((...responses) => {
             from = responses[0].data;
             to = responses[1].data;
-            console.log(responses);
           })
         )
         .catch((e) => {
@@ -360,35 +272,32 @@ export default async function handler(req, res) {
       toForecastDay.forEach((daydetails, index) => {
         let code = daydetails.day.condition.code;
         let rainy = false;
-        for (let i = 0; i < noRainyCodes.length; i++) {
-          if (noRainyCodes[i].code === code) {
+        for (let i = 0; i < rainyAndTunderingWeatherCodes.length; i++) {
+          if (rainyAndTunderingWeatherCodes[i].code === code) {
             rainy = true;
           }
         }
-        if (!rainy) {
-          toForecastDay[index].rainy = false;
-        }
+        toForecastDay[index].rainy = rainy;
       });
 
       let fromForecastDay = from.forecast.forecastday;
       fromForecastDay.forEach((daydetails, index) => {
         let code = daydetails.day.condition.code;
         let rainy = false;
-        for (let i = 0; i < noRainyCodes.length; i++) {
-          if (noRainyCodes[i].code === code) {
+        for (let i = 0; i < rainyAndTunderingWeatherCodes.length; i++) {
+          if (rainyAndTunderingWeatherCodes[i].code === code) {
             rainy = true;
           }
         }
-        if (!rainy) {
-          fromForecastDay[index].rainy = false;
-        }
+        fromForecastDay[index].rainy = rainy;
       });
+
       let startDay;
       let fromIndex = -1;
       let reachIndex = -1;
-      for (let i = 0; i < 14; i++) {
+      for (let i = 0; i < toForecastDay.length; i++) {
         if (!startDay) {
-          for (let j = i; j < 14; j++) {
+          for (let j = i; j < fromForecastDay.length; j++) {
             if (!fromForecastDay[i].rainy && !toForecastDay[j].rainy) {
               if (j - i === travelTimeInDays) {
                 startDay = new Date(
@@ -415,34 +324,41 @@ export default async function handler(req, res) {
       await axios(config).then((res) => {
         tweets = res.data;
       });
+      let message;
       if (startDay) {
-        req.body = {
-          message:
-            "Hii Mr/Mrs" +
-            req.body.user +
-            ".\n" +
-            "We hope you are well. We found that you can start your journey on " +
-            startDay +
-            "best of luck for your journey.",
-          phone: req.body.phone ? req.body.phone : undefined,
-          email: req.body.email,
-        };
-        let data = await mailer(req);
-        let resData = {
-          startDay,
-          tweets,
-          condition: [fromForecastDay[fromIndex], toForecastDay[reachIndex]],
-        };
-        if (data.error) {
-          resData.error =
-            "Email has been sent to your mail but not sms beacsue your mobile is not verified by twillio to send sms.!";
-        }
-        return res.status(200).json(resData);
+        message =
+          "Hii Mr/Mrs" +
+          req.body.user +
+          ".\n" +
+          "We hope you are well.\n" +
+          "No suitable date found withing next 14 days.";
       } else {
-        return res.status(404).json({
-          message: "No suitable date found withing next 14 days",
-        });
+        message =
+          "Hii Mr/Mrs" +
+          req.body.user +
+          ".\n" +
+          "We hope you are well.\n We found that you can start your journey on " +
+          startDay +
+          "  best of luck for your journey.";
       }
+      req.body = {
+        phone: req.body.phone ? req.body.phone : undefined,
+        email: req.body.email,
+        message,
+      };
+      let data = await mailer(req);
+      let resData = {
+        startDay,
+        tweets,
+        to,
+        from,
+        condition: [fromForecastDay[fromIndex], toForecastDay[reachIndex]],
+      };
+      if (data.error) {
+        resData.error =
+          "Email has been sent to your mail but not sms beacsue your mobile is not verified by twillio to send sms.!";
+      }
+      return res.status(200).json(resData);
     } catch (error) {
       console.log(error.message);
       return res.status(500).json({

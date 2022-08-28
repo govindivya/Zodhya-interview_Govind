@@ -49,7 +49,13 @@ export default function Home() {
         .then((res) => {
           setTweets(res.data.tweets.data);
           setLoading(false);
-          setSheduleTime(res.data.startDay);
+          if (res.data.startDay) {
+            setSheduleTime(
+              "You can start your journey on :" + res.data.startDay
+            );
+          } else {
+            setSheduleTime("No suitable date found within 14 days.");
+          }
           if (!res.data.error) {
             alert.success(
               "All the details has been set to your mobile and email."
@@ -69,7 +75,7 @@ export default function Home() {
   useEffect(() => {
     console.log(tweets);
     if (tweets.length > 0) {
-      window.scrollBy(0,500);
+      window.scrollBy(0, 500);
     }
   }, [tweets]);
 
@@ -147,9 +153,11 @@ export default function Home() {
               </button>
             </form>
             <div className="flex justify-center mt-10 mx-auto">
-              {
-                sheduleTime !=""?<p className="text-2xl text-blue-900">You can start your journey on :{sheduleTime}</p>:""
-              }
+              {sheduleTime != "" ? (
+                <p className="text-2xl text-blue-900">{sheduleTime}</p>
+              ) : (
+                ""
+              )}
             </div>
           </div>
         </div>
