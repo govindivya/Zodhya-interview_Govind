@@ -16,7 +16,7 @@ const Tweet = ({ tweet }) => {
           </a>
         </h1>
       </div>
-      <div className="w-full relative p-5 m-5 ">{tweet.text}</div>
+      <div className="w-full relative p-5 m-5 ">{String(tweet.text).substring(0,200)}</div>
     </div>
   );
 };
