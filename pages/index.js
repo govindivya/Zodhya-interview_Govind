@@ -32,6 +32,7 @@ export default function Home() {
         },
       };
       setLoading(true);
+<<<<<<< HEAD
       let data = {
         from,
         to,
@@ -39,6 +40,9 @@ export default function Home() {
         user: session.user.name,
         email: session.user.email,
       };
+=======
+      let data = { from, to, time, email: session.user.email ,user: session.user.name,};
+>>>>>>> 81d830722aad39dc01073092ffc62bf51d235d91
       if (phone) {
         if (String(phone).length === 10) {
           data.phone = "+91" + String(phone);
