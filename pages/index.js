@@ -50,13 +50,7 @@ export default function Home() {
           setTweets(res.data.tweets.data);
           setLoading(false);
           setSheduleTime(res.data.startDay);
-          if (!res.data.error) {
-            alert.success(
-              "All the details has been set to your mobile and email."
-            );
-          } else {
-            alert.error(res.data.error);
-          }
+          alert.success(res.data.startDay);
         })
         .catch((e) => {
           console.log(e);
